@@ -18,6 +18,14 @@ class Mahasiswa {
         $stmt->execute();
         return $stmt;
     }
+   
+    public function search($keyword) {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE nama LIKE ? OR npm LIKE ? ORDER BY id DESC";
+        $stmt = $this->conn->prepare($query);
+        $keyword = "%{$keyword}%";
+        $stmt->execute([$keyword, $keyword]);
+        return $stmt;
+    }
 
     public function create() {
         $query = "INSERT INTO " . $this->table_name . " (npm, nama, jurusan) VALUES (?, ?, ?)";
@@ -37,6 +45,14 @@ class Mahasiswa {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         if ($stmt->execute([$this->id])) { return true; }
+        return false;
+    }
+
+    public function checkNpm() {
+        $query = "SELECT id FROM " . $this->table_name . " WHERE npm = ? LIMIT 0,1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$this->npm]);
+        if($stmt->rowCount() > 0) { return true; }
         return false;
     }
 }
